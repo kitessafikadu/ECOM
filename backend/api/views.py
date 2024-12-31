@@ -6,8 +6,40 @@ from .models import Product, Category
 from .serializers import ProductSerializer, CategorySerializer
 from django.http import HttpResponse
 
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
+
+@api_view(['PUT'])
+def rate_product(request, pk):
+    print("Request data:", request.data)  # Debugging line
+
+    product = get_object_or_404(Product, pk=pk)
+    new_rating = request.data.get('rating')  # Should now parse correctly
+
+    if new_rating is not None:
+        try:
+            new_rating = float(new_rating)
+            if 0 <= new_rating <= 5:
+                product.rating = new_rating
+                product.save()
+                return JsonResponse({
+                    "id": product.id,
+                    "name": product.name,
+                    "rating": product.rating,
+                    "message": "Rating updated successfully",
+                })
+            else:
+                return JsonResponse({"error": "Rating must be between 0 and 5"}, status=400)
+        except ValueError:
+            return JsonResponse({"error": "Invalid rating value"}, status=400)
+    return JsonResponse({"error": "Rating is required"}, status=400)
+
+
+
 def home(request):
     return HttpResponse("Welcome to the E-Commerce API!")
+
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()

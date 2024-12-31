@@ -12,6 +12,8 @@ const UploadProductPage = () => {
   });
 
   const [categories, setCategories] = useState([]);
+  const [message, setMessage] = useState(null); // For displaying success/error messages
+  const [isError, setIsError] = useState(false); // To differentiate success or error
 
   // Fetch categories from the backend (assumed to be available)
   React.useEffect(() => {
@@ -39,16 +41,48 @@ const UploadProductPage = () => {
       method: "POST",
       body: form,
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          setMessage("Product uploaded successfully!");
+          setIsError(false);
+          return response.json();
+        } else {
+          throw new Error("Failed to upload product");
+        }
+      })
       .then((data) => {
         console.log("Product uploaded:", data);
+        setFormData({
+          name: "",
+          description: "",
+          price: "",
+          stock: "",
+          rating: "",
+          category_id: "",
+          image: null,
+        });
       })
-      .catch((error) => console.error("Error uploading product:", error));
+      .catch((error) => {
+        console.error("Error uploading product:", error);
+        setMessage("Error uploading product. Please try again.");
+        setIsError(true);
+      });
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-64 py-8">
       <h1 className="text-2xl font-semibold mb-6">Upload Product</h1>
+
+      {message && (
+        <div
+          className={`p-4 mb-4 rounded-md ${
+            isError ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
+          }`}
+        >
+          {message}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block font-semibold">Name</label>

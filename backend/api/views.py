@@ -6,6 +6,7 @@ from rest_framework import filters, status
 from .models import Product, Category, Order, OrderItem, Cart, CartItem, Payment, ShippingAddress, Review, Wishlist, Coupon
 from .serializers import ProductSerializer, CategorySerializer, OrderSerializer, OrderItemSerializer, CartSerializer, CartItemSerializer, PaymentSerializer, ShippingAddressSerializer, ReviewSerializer, WishlistSerializer, CouponSerializer
 from django.shortcuts import get_object_or_404
+from rest_framework.permissions import AllowAny
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -13,6 +14,7 @@ class ProductViewSet(ModelViewSet):
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
     ordering_fields = ['price', 'created_at', 'rating']
     filterset_fields = ['category', 'price', 'rating']
+    permission_classes = [AllowAny]
 
     @action(detail=True, methods=['put'])
     def rate(self, request, pk=None):
@@ -28,6 +30,7 @@ class ProductViewSet(ModelViewSet):
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [AllowAny]
 
     @action(detail=False, methods=['get'], url_path='(?P<category_name>[^/.]+)/products')
     def products_by_category(self, request, category_name=None):

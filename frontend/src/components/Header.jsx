@@ -1,84 +1,134 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Import the FontAwesomeIcon component
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"; // Import the magnifying glass icon
-import { faUser } from "@fortawesome/free-solid-svg-icons";
-import { faShoppingCart } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBars,
+  faMagnifyingGlass,
+  faUser,
+  faShoppingCart,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const categories = ["Electronics", "Fashion", "Home", "Sports", "Beauty"]; // Example categories
+  const [categories, setCategories] = useState([]); // State to store fetched categories
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  useEffect(() => {
+    // Fetch categories from backend
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/categories/"); // Adjust the URL as per your API
+        const data = await response.json();
+        setCategories(data); // Assuming your API returns a list of categories
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
 
-  const handleCategoryChange = (e) => {
-    setSelectedCategory(e.target.value);
-  };
+    fetchCategories();
+  }, []); // Run only once on component mount
+
+  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+  const handleCategoryChange = (e) => setSelectedCategory(e.target.value);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    // Handle search logic (navigate or filter products)
     console.log("Searching for:", searchQuery, "Category:", selectedCategory);
   };
 
   return (
-    <header className="bg-gray-800 text-white p-4 shadow-md">
+    <header className="bg-gray-800 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
-        {/* Website logo and name */}
+        {/* Logo */}
         <div className="text-2xl font-bold">
-          <Link to="/">My E-Commerce</Link>
+          <Link to="/" className="hover:text-gray-400">
+            My E-Commerce
+          </Link>
         </div>
 
-        {/* Search form */}
+        {/* Hamburger Menu for Mobile */}
+        <button
+          className="block md:hidden text-xl"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          <FontAwesomeIcon icon={menuOpen ? faTimes : faBars} />
+        </button>
+
+        {/* Navigation Links */}
+        <nav
+          className={`${
+            menuOpen ? "block" : "hidden"
+          } absolute top-full left-0 w-full bg-gray-800 md:static md:w-auto md:flex md:items-center`}
+        >
+          <div className="flex flex-col md:flex-row md:space-x-6">
+            <Link to="/orders" className="p-2 hover:text-gray-400">
+              Orders
+            </Link>
+            <Link
+              to="/cart"
+              className="p-2 hover:text-gray-400"
+              aria-label="View cart"
+            >
+              <FontAwesomeIcon icon={faShoppingCart} />
+            </Link>
+            <Link
+              to="/account"
+              className="p-2 hover:text-gray-400"
+              aria-label="User account"
+            >
+              <FontAwesomeIcon icon={faUser} />
+            </Link>
+          </div>
+        </nav>
+      </div>
+
+      {/* Search and Category Section */}
+      <div className="mt-4 md:mt-0 md:flex md:justify-between md:items-center">
+        {/* Search Form */}
         <form
           onSubmit={handleSearchSubmit}
-          className="relative flex items-center space-x-2"
+          className="relative flex items-center space-x-2 w-full md:w-auto"
         >
           <input
             type="text"
             value={searchQuery}
             onChange={handleSearchChange}
             placeholder="Search products"
-            className="p-3 pl-10 rounded-md text-black w-full max-w-xs border-2 border-gray-300 focus:outline-none focus:border-blue-600"
+            className="p-2 pl-10 rounded-md text-black w-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            aria-label="Search products"
           />
-          {/* Magnifying glass icon inside the input */}
           <FontAwesomeIcon
-            icon={faMagnifyingGlass} // Use the imported icon reference
+            icon={faMagnifyingGlass}
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
             size="lg"
           />
+          <button
+            type="submit"
+            className="hidden md:block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            aria-label="Search"
+          >
+            Search
+          </button>
         </form>
 
-        {/* Category dropdown */}
-        <div className="relative">
+        {/* Category Dropdown */}
+        <div className="mt-4 md:mt-0">
           <select
             value={selectedCategory}
             onChange={handleCategoryChange}
-            className="p-2 rounded-md text-black border-2 border-gray-300 focus:outline-none focus:border-blue-600"
+            className="p-2 rounded-md text-black border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 w-full md:w-auto"
+            aria-label="Select category"
           >
             <option value="">Select Category</option>
-            {categories.map((category, index) => (
-              <option key={index} value={category}>
-                {category}
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
               </option>
             ))}
           </select>
-        </div>
-
-        {/* Navigation links */}
-        <div className="flex space-x-6">
-          <Link to="/orders" className="hover:text-gray-400">
-            Orders
-          </Link>
-          <Link to="/cart" className="hover:text-gray-400">
-            <FontAwesomeIcon icon={faShoppingCart} />
-          </Link>
-          <Link to="/account" className="hover:text-gray-400">
-            <FontAwesomeIcon icon={faUser} />
-          </Link>
         </div>
       </div>
     </header>

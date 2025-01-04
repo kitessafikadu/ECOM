@@ -1,9 +1,16 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import StarRating from "./StarRating";
 
-const ProductCard = ({ product, onRatingChange }) => {
-  const handleRatingUpdate = (newRating) => {
-    onRatingChange(product.id, newRating);
+const ProductCard = ({ product }) => {
+  const navigate = useNavigate();
+
+  const handleAddToCart = () => {
+    navigate("/cart");
+  };
+
+  const handleViewDetails = () => {
+    navigate(`/products/${product.product_id}`);
   };
 
   return (
@@ -22,40 +29,30 @@ const ProductCard = ({ product, onRatingChange }) => {
       {/* Product Info */}
       <div className="flex-grow flex flex-col justify-between">
         <div className="mt-4">
-          {/* Product Name */}
           <h2 className="text-lg font-semibold line-clamp-2">{product.name}</h2>
-          {/* Product Description */}
           <p className="text-gray-600 mt-2 line-clamp-3">
             {product.description}
           </p>
         </div>
 
-        {/* Price and Rating */}
         <div className="mt-4">
-          {/* Product Price */}
           <p className="text-xl font-bold text-blue-600">${product.price}</p>
-
-          {/* Star Rating */}
           <div className="mt-2">
-            <StarRating
-              defaultRating={product.rating}
-              onSetRating={handleRatingUpdate}
-            />
+            <StarRating defaultRating={product.rating} />
           </div>
         </div>
       </div>
 
-      {/* CTA Buttons */}
       <div className="mt-4 flex justify-between">
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-          onClick={() => console.log(`Added ${product.name} to cart`)}
+          onClick={handleAddToCart}
         >
           Add to Cart
         </button>
         <button
           className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition"
-          onClick={() => console.log(`Viewing details of ${product.name}`)}
+          onClick={handleViewDetails}
         >
           View Details
         </button>

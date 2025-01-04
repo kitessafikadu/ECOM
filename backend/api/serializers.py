@@ -1,6 +1,38 @@
 from rest_framework import serializers
-from .models import Category, Product, Order, OrderItem, Cart, CartItem, Payment, ShippingAddress, Review, Wishlist, Coupon, User
+from .models import User, Category, Product, Order, OrderItem, Cart, CartItem, Payment, ShippingAddress, Review, Wishlist, Coupon, User
+import re
 
+class UserSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'password', 'role', 'first_name', 'last_name', 'profile_picture']
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'first_name': {'required': True},
+            'username': {'required': True},
+            'email': {'required': False},
+            'last_name': {'required': True},
+            'role': {'required': True},
+        }
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Username already taken.")
+        return value
+
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Password must be at least 8 characters long.")
+        return value
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = User.objects.create(**validated_data)
+        user.set_password(password)  # Hash password before saving
+        user.save()
+        return user
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

@@ -3,10 +3,26 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status
-from .models import Product, Category, Order, OrderItem, Cart, CartItem, Payment, ShippingAddress, Review, Wishlist, Coupon
-from .serializers import ProductSerializer, CategorySerializer, OrderSerializer, OrderItemSerializer, CartSerializer, CartItemSerializer, PaymentSerializer, ShippingAddressSerializer, ReviewSerializer, WishlistSerializer, CouponSerializer
+from .models import User, Product, Category, Order, OrderItem, Cart, CartItem, Payment, ShippingAddress, Review, Wishlist, Coupon
+from .serializers import UserSerializer, ProductSerializer, CategorySerializer, OrderSerializer, OrderItemSerializer, CartSerializer, CartItemSerializer, PaymentSerializer, ShippingAddressSerializer, ReviewSerializer, WishlistSerializer, CouponSerializer
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
+class UserViewSet(ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        user = self.get_object()  
+        if user != request.user: 
+            return Response({"detail": "You cannot update another user's profile."}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(user, data=request.data, partial=True)  
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Profile updated successfully!", "user": serializer.data})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -43,7 +59,6 @@ class CategoryViewSet(ModelViewSet):
 
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
-
 
 class OrderViewSet(ModelViewSet):
     queryset = Order.objects.all()
@@ -96,7 +111,6 @@ class CartViewSet(ModelViewSet):
         quantity = request.data.get('quantity', 1)
         product = get_object_or_404(Product, pk=product_id)
 
-        # Ensure product is in stock
         if product.stock < quantity:
             return Response({"error": "Not enough stock available."}, status=status.HTTP_400_BAD_REQUEST)
 

@@ -19,6 +19,7 @@ class User(AbstractUser):
     ]
 
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=USER)
+    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
 
     def __str__(self):
         return f"{self.username} ({self.role})"
@@ -42,7 +43,7 @@ class User(AbstractUser):
         blank=True,
         help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.'
     )
-    
+
     user_permissions = models.ManyToManyField(
         'auth.Permission',
         related_name='custom_user_permissions',
@@ -50,8 +51,6 @@ class User(AbstractUser):
         help_text='Specific permissions for this user.',
         symmetrical=False
     )
-
-
 
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)  

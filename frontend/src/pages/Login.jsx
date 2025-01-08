@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -35,11 +36,9 @@ const Login = () => {
       <h2 className="text-xl font-semibold text-center mb-4">Login</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="username" className="block mb-2">
-            Username
-          </label>
           <input
             type="text"
+            placeholder="Enter username"
             id="username"
             name="username"
             value={formData.username}
@@ -49,13 +48,11 @@ const Login = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="password" className="block mb-2">
-            Password
-          </label>
           <input
             type="password"
             id="password"
             name="password"
+            placeholder="Enter password"
             value={formData.password}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
@@ -69,6 +66,21 @@ const Login = () => {
           Login
         </button>
       </form>
+
+      <div className="text-center mt-4">
+        <p>
+          Don't have an account?{" "}
+          <Link to="/register" className="text-blue-500 hover:underline">
+            Register
+          </Link>
+        </p>
+        <p>
+          Forgot your password?{" "}
+          <Link to="/forgot-password" className="text-blue-500 hover:underline">
+            Reset Password
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

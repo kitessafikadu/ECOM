@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -40,13 +40,11 @@ const Register = () => {
       <h2 className="text-xl font-semibold text-center mb-4">Register</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="first_name" className="block mb-2">
-            First Name
-          </label>
           <input
             type="text"
             id="first_name"
             name="first_name"
+            placeholder="Enter first name"
             value={formData.first_name}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
@@ -54,13 +52,11 @@ const Register = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="last_name" className="block mb-2">
-            Last Name
-          </label>
           <input
             type="text"
             id="last_name"
             name="last_name"
+            placeholder="Enter last name"
             value={formData.last_name}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
@@ -68,13 +64,11 @@ const Register = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="username" className="block mb-2">
-            Username
-          </label>
           <input
             type="text"
             id="username"
             name="username"
+            placeholder="Enter username"
             value={formData.username}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
@@ -82,24 +76,18 @@ const Register = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="password" className="block mb-2">
-            Password
-          </label>
           <input
             type="password"
             id="password"
             name="password"
+            placeholder="Enter password"
             value={formData.password}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
             required
           />
         </div>
-
         <div className="mb-4">
-          <label htmlFor="role" className="block mb-2">
-            Role
-          </label>
           <select
             id="role"
             name="role"
@@ -107,6 +95,9 @@ const Register = () => {
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md"
           >
+            <option value="" disabled>
+              Select user type
+            </option>
             <option value="user">User</option>
             <option value="seller">Seller</option>
           </select>
@@ -118,6 +109,15 @@ const Register = () => {
           Register
         </button>
       </form>
+
+      <div className="text-center mt-4">
+        <p>
+          Already have an account?{" "}
+          <Link to="/login" className="text-blue-500 hover:underline">
+            Login
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

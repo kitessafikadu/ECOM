@@ -8,16 +8,19 @@ const Profile = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch user profile data
     const fetchProfile = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/profile/", {
-          withCredentials: true, // Include authentication credentials
+        const response = await axios.get("http://127.0.0.1:8000/api/users/me", {
+          withCredentials: true, // Include credentials for authentication
         });
         setUser(response.data);
       } catch (err) {
         console.error("Error fetching profile:", err);
-        setError("Failed to load profile. Please try again.");
+        setError(
+          err.response?.status === 401
+            ? "You are not authorized. Please log in."
+            : "Failed to load profile. Please try again."
+        );
       }
     };
 
@@ -30,9 +33,9 @@ const Profile = () => {
 
   if (!user) {
     return error ? (
-      <p className="text-red-600 text-center">{error}</p>
+      <p className="text-red-600 text-center mt-4">{error}</p>
     ) : (
-      <p>Loading...</p>
+      <p className="text-center mt-4">Loading...</p>
     );
   }
 
@@ -54,14 +57,8 @@ const Profile = () => {
           <strong>Email:</strong> {user.email}
         </p>
         <p className="text-gray-600 text-center mb-2">
-          <strong>Role:</strong> {user.role}
+          <strong>Role:</strong> {user.role || "User"}
         </p>
-        {user.bio && (
-          <p className="text-gray-600 text-center mb-2">
-            <strong>Bio:</strong> {user.bio}
-          </p>
-        )}
-
         {/* Action Buttons */}
         <div className="flex justify-center mt-4">
           <button
